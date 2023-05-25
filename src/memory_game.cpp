@@ -123,7 +123,7 @@ void print_table(const std::vector<T> &table) {
     for (int i = 0; i < table.size(); i++) {
         table_print[i] = ' ';
 
-        if (table[i] != NULL) {
+        if (table[i] != 0) {
             table_print[i] = table[i];
         }
     }
@@ -178,7 +178,7 @@ void ask_data(const std::vector<T> &table, int& answer, int& old_answer, int& me
     }
 
     // If two matches are answered already, but the user checkes a non-answered and an answered value, the program will mark it as no match, however, we must not allow the user to check the same value twice.
-    if ((table[answer - 1] != NULL) && ((table[old_answer] == NULL) || (table[old_answer] != NULL))) {
+    if ((table[answer - 1] != 0) && ((table[old_answer] == 0) || (table[old_answer] != 0))) {
        std::cout << "\nYou can't check the same value twice.\n\n";
        reset_data(table, answer, old_answer, memory_count);
     }
@@ -232,8 +232,8 @@ bool match(const std::vector<T> &table, std::vector<T> &table_empty, int &answer
             else {
                 std::cout << "\nNo match (value was " << table[i - 1] << ", index is " << i << ").\n\n";
 
-                table_empty[old_answer - 1] = NULL;
-                table_empty[answer - 1] = NULL;
+                table_empty[old_answer - 1] = 0;
+                table_empty[answer - 1] = 0;
 
                 first_time = true;
                 memory_count = 0;
@@ -283,18 +283,19 @@ void assign_results(std::vector<T> &table_empty, std::vector<T> &table, int& ans
 
     // Has the user finished the game? Use a `for` loop, and if the table is full, ask the user if he wants to play again.
     for (int i = 0; i < table.size() + 1; i++) {
-        if (table_empty[i] == NULL) {
+        if (table_empty[i] == 0) {
 			break;
 		}
         else if (i == table.size() - 1) {
             print_table(table);
 
 			std::cout << "\n\nYou won. Congratulations! Do you want to play again? (y/n)\n";
+            std::cout << "Size " << table.size() << " will be used. This can be changed by re-running the game.";
 			std::cin >> try_again;
             if (try_again == 'y') {
                 // This is needed when checking if the user has two matches already.
                 for (int i = 0; i < table_empty.size(); i++) {
-                    table_empty[i] = NULL;
+                    table_empty[i] = 0;
                 }
 
 				init(table);
