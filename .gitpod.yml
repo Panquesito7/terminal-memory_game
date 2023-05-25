@@ -1,6 +1,6 @@
 tasks:
   - name: Run game
-    init: g++ -o memory_game src/memory_game
+    init: g++ -o memory_game src/memory_game.cpp
     command: ./memory_game
 
 github:

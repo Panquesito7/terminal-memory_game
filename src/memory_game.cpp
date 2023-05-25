@@ -21,6 +21,7 @@
 #include <cstdlib>     /// for std::srand()
 #include <vector>      /// for std::vector
 #include <algorithm>   /// for std::shuffle()
+#include <random>      /// for std::mt19937
 
 #ifdef _WIN32
 #include <windows.h>  /// for sleep
@@ -116,13 +117,23 @@ void init(std::vector<T> &table) {
 */
 template <typename T>
 void print_table(const std::vector<T> &table) {
-    std::cout << " | ";
+    std::cout << "| ";
+    std::vector<T> table_print(table.size());
+
+    for (int i = 0; i < table.size(); i++) {
+        table_print[i] = ' ';
+
+        if (table[i] != NULL) {
+            table_print[i] = table[i];
+        }
+    }
+
     for (int i = 0; i < table.size(); i++) {
         if (i % 5 == 0 && i != 0) {
-			std::cout << "\n | ";
+			std::cout << "\n| ";
 		}
 
-		std::cout << table[i] << " | ";
+		std::cout << table_print[i] << " | ";
 	}
 }
 
@@ -145,7 +156,7 @@ void ask_data(const std::vector<T> &table, int& answer, int& old_answer, int& me
     old_answer = answer;
     print_table(table);
 
-    std::cout << "\nType your response here (number index):\n";
+    std::cout << "\n\nType your response here (number index):\n";
     std::cin >> answer;
 
     if (is_number(answer)) {
@@ -278,11 +289,11 @@ void assign_results(std::vector<T> &table_empty, std::vector<T> &table, int& ans
         else if (i == table.size() - 1) {
             print_table(table);
 
-			std::cout << "\nYou won. Congratulations! Do you want to play again? (y/n)\n";
+			std::cout << "\n\nYou won. Congratulations! Do you want to play again? (y/n)\n";
 			std::cin >> try_again;
             if (try_again == 'y') {
                 // This is needed when checking if the user has two matches already.
-                for (int i = 0; i < table.size(); i++) {
+                for (int i = 0; i < table_empty.size(); i++) {
                     table_empty[i] = NULL;
                 }
 
@@ -296,6 +307,8 @@ void assign_results(std::vector<T> &table_empty, std::vector<T> &table, int& ans
 			}
             else {
 				std::cout << "\nInvalid input (exitting...).\n";
+                sleep(3);
+
                 exit(0);
 			}
 		}
