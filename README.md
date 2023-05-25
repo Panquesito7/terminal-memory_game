@@ -1,7 +1,7 @@
 # Memory Game (terminal)
 
 A simple memory game built in C++ with 3 multiple sizes.\
-The game is played in the terminal and letters are used ([GUI version](https://github.com/Panquesito7/memory_game)).
+The game is played in the terminal and letters are used ([GUI version](https://github.com/Panquesito7/memory-game)).
 
 ## 💻 Building the program
 
