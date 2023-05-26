@@ -26,24 +26,34 @@
 // `Sleep` is only available in Windows in milliseconds.
 // However, on Unix/Linux systems it is `sleep`, in seconds.
 #ifdef _WIN32
-    #include <Windows.h>  /// for Sleep()
-
-    template <typename T>
-    constexpr auto SLEEP(T a) -> void { Sleep(a * 1000); }
+#include <Windows.h>  /// for Sleep()
+template <typename T>
+constexpr typename std::enable_if<std::is_integral<T>::value, void>::type SLEEP(
+    T milliseconds) {
+    Sleep(milliseconds * 1000);
+}
 #else
-    #include <unistd.h>  /// for sleep()
-
-    template <typename T>
-    constexpr auto SLEEP(T a) -> void { sleep(a); }
+#include <unistd.h>  /// for sleep()
+template <typename T>
+constexpr T SLEEP(T seconds) {
+    return sleep(seconds);
+}
 #endif
 
-// `std::random_shuffle` was deprecated in C++14. To keep support with most compilers, we need to check the C++ version.
+// `std::random_shuffle` was deprecated in C++14. To keep support with most
+// compilers, we need to check the C++ version.
 #if __cplusplus >= 201402L
-    template <typename T>
-    constexpr auto SHUFFLE(T a, T b) -> void { std::shuffle(a, b, std::mt19937(std::random_device()())); }
+template <typename T>
+constexpr auto SHUFFLE(T a, T b) {
+    std::shuffle(a, b, std::mt19937(std::random_device()()));
+}
 #else
-    template <typename T>
-    constexpr auto SHUFFLE(T a, T b) -> void { std::random_shuffle(a, b); }
+// TO-DO: find a way to not use `void`, as `void` is not a literal type in
+// C++11.
+template <typename T>
+constexpr auto SHUFFLE(T a, T b) -> void {
+    std::random_shuffle(a, b);
+}
 #endif
 
 /**
@@ -65,7 +75,7 @@ template <typename T>
 bool is_number(const T &input) {
     if (std::cin.fail()) {
         std::cin.clear();
-        std::cin.ignore(256, '\n');
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
         return false;
     }
