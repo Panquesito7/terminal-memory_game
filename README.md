@@ -17,7 +17,7 @@ If you don't have CMake/G++ installed, you can check this [ultimate guide](https
 
 ## 🚀 Contributing
 
-Found anything that can be improved or a bug? Feel free to create [an issue](https://github.com/Panquesito7/issues/new/choose) to get started!\
+Found anything that can be improved or a bug? Feel free to create [an issue](https://github.com/Panquesito7/terminal-memory_game/issues/new/choose) to get started!\
 Every contribution (small or big) is greatly appreciated. Thank you for your interest. ❤️
 
 ## 📝 License
