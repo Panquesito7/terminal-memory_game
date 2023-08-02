@@ -1,0 +1,19 @@
+name: Compile code
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Install dependencies
+        if: matrix.os == 'windows-latest'
+        run: |
+          choco install mingw
+      - name: Build
+        run: |
+          g++ -std=c++14 -o memory_game ./src/memory_game.cpp
