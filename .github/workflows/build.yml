@@ -5,15 +5,25 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [ubuntu-latest, macOS-latest]
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Install dependencies
-        if: matrix.os == 'windows-latest'
-        run: |
-          choco install mingw
-      - name: Build
+      - name: Build and run program
         run: |
           g++ -std=c++14 -o memory_game ./src/memory_game.cpp
+          echo 2 | ./memory_game
+  build-windows:
+    runs-on: [windows-latest]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set up MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        
+      - name: Build and run program
+        run: |
+          cl ./src/memory_game.cpp
+          echo 2 | ./memory_game.exe

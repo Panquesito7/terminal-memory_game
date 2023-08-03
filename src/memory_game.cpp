@@ -16,12 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
 #include <algorithm>  /// for std::shuffle()
 #include <cstdlib>    /// for std::srand()
 #include <ctime>      /// for std::time()
 #include <iostream>   /// for IO operations
 #include <random>     /// for std::mt19937
 #include <vector>    /// for std::vector
+#include <cassert>   /// for assert
+#include <map>       /// for std::map
 
 // `Sleep` is only available in Windows in milliseconds.
 // However, on Unix/Linux systems it is `sleep`, in seconds.
@@ -90,7 +96,7 @@ bool is_number(const T &input) {
  * @returns void
  */
 template <typename T>
-void init(std::vector<T> *table) {
+void init(std::vector<T> *table, bool show_message = true) {
     std::vector<char> letters(7);
 
     // Decrease / increase the number of letters depending on the size.
@@ -114,13 +120,15 @@ void init(std::vector<T> *table) {
         (*table)[i] = pairs[i];
     }
 
-    std::cout << "All available types are: ";
+    if (show_message == true) {
+        std::cout << "All available types are: ";
 
-    for (int i = 0; i < letters.size(); i++) {
-        if (i == letters.size() - 1) {
-            std::cout << "and " << letters[i] << ".\n\n";
-        } else {
-            std::cout << letters[i] << ", ";
+        for (int i = 0; i < letters.size(); i++) {
+            if (i == letters.size() - 1) {
+                std::cout << "and " << letters[i] << ".\n\n";
+            } else {
+                std::cout << letters[i] << ", ";
+            }
         }
     }
 }
@@ -365,61 +373,125 @@ void assign_results(std::vector<T> *table_empty, std::vector<T> *table,
 }  // namespace memory_game
 
 /**
+ * @brief Checks if the given table has two instances
+ * of all the letters. The bigger size, the more letters available.
+ * @param table The table that will be checked
+ * @return true if the table has two instances of all the letters
+ * @return false if the table has LESS than two instances of all the letters
+ */
+bool check_table(std::vector<char> table) {
+    std::map<char, int> count;
+    memory_game::init(&table, false);
+
+    for (int i = 0; i < table.size(); i++) {
+        count[table[i]]++;
+    }
+
+    // Check that all the letters have exactly two of the same.
+    for (int i = 0; i < table.size(); i++) {
+        if (count[table[i]] != 2) {
+            std::cout << table[i] << " " << count[table[i]];
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/**
+ * @brief Self-test implementations
+ * @returns void
+ */
+static void tests() {
+    // 1st test: 4x2
+    std::vector<char> table_4x2(8);
+    assert(check_table(table_4x2) == true);
+
+    // 2nd test: 5x2
+    std::vector<char> table_5x2(10);
+    assert(check_table(table_5x2) == true);
+
+    // 3rd test: 7x2
+    std::vector<char> table_7x2(14);
+    assert(check_table(table_7x2) == true);
+
+    std::cout << "All tests have successfully passed!\n";
+}
+
+/**
  * @brief Main function
  * @returns 0 on exit
  */
 int main() {
-    // Start randomizer. This changes the values every time.
-    std::srand(std::time(nullptr));
-
-    int size = 0;       ///< Size of the table.
-    int selection = 0;  ///< Selection of the size (4x2, 5x2, 7x2).
-
-    int response = 0;    ///< The answer (number index) that the user chose.
-    int old_answer = 0;  ///< Previous answer (number index).
-
-    int memory_count =
-        0;  ///< Counter to check if the user has already answered two values.
-    bool first_time = true;  ///< Whether the user has answered 1 value or not
-                             ///< (previous answered values do not count).
-
-    std::cout << "\tMEMORY GAME\n";
+    int choice = 0;
 
     do {
-        std::cout << "\n1. 4x2 (1)";
-        std::cout << "\n2. 5x2 (2)";
-        std::cout << "\n3. 7x2 (3)\n";
+        std::cout << "1. Interactive mode.\n";
+        std::cout << "2. Self-tests mode.\n\n";
 
-        std::cout << "\nChoose table size: ";
-        std::cin >> selection;
-    } while ((selection < 1 || selection > 3) &&
+        std::cout << "Choose mode: ";
+        std::cin >> choice;
+
+        std::cout << "\n";
+    } while ((choice < 1) || (choice > 2) &&
+        (!memory_game::is_number(choice)));
+    
+    if (choice == 1) {
+        // Start randomizer. This changes the values every time.
+        std::srand(std::time(nullptr));
+
+        int size = 0;       ///< Size of the table.
+        int selection = 0;  ///< Selection of the size (4x2, 5x2, 7x2).
+
+        int response = 0;    ///< The answer (number index) that the user chose.
+        int old_answer = 0;  ///< Previous answer (number index).
+
+        int memory_count =
+            0;  ///< Counter to check if the user has already answered two values.
+        bool first_time = true;  ///< Whether the user has answered 1 value or not
+                                ///< (previous answered values do not count).
+
+        std::cout << "\tMEMORY GAME\n";
+
+        do {
+            std::cout << "\n1. 4x2 (1)";
+            std::cout << "\n2. 5x2 (2)";
+            std::cout << "\n3. 7x2 (3)\n";
+
+            std::cout << "\nChoose table size: ";
+            std::cin >> selection;
+        } while ((selection < 1 || selection > 3) &&
              (!memory_game::is_number(selection)));
 
-    switch (selection) {
-        case 1:
-            size = 8;
-            break;
-        case 2:
-            size = 10;
-            break;
-        case 3:
-            size = 14;
-            break;
-        default:
-            size = 10;
-            break;
+        switch (selection) {
+            case 1:
+                size = 8;
+                break;
+            case 2:
+                size = 10;
+                break;
+            case 3:
+                size = 14;
+                break;
+            default:
+                size = 10;
+                break;
+        }
+
+        std::vector<char> table(size);
+        std::vector<char> table_empty(size);
+
+        std::cout << "\n";
+
+        memory_game::init(&table);
+        memory_game::ask_data(table_empty, &response, &old_answer,
+                                    &memory_count);
+        memory_game::assign_results(&table_empty, &table, &response,
+                                    &first_time, &old_answer, &memory_count);
     }
-
-    std::vector<char> table(size);
-    std::vector<char> table_empty(size);
-
-    std::cout << "\n";
-
-    memory_game::init(&table);
-    memory_game::ask_data(table_empty, &response, &old_answer,
-                                 &memory_count);
-    memory_game::assign_results(&table_empty, &table, &response,
-                                       &first_time, &old_answer, &memory_count);
+    else if (choice == 2) {
+        tests();  // run self-tests
+    }
 
     return 0;
 }
